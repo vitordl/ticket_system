@@ -62,6 +62,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
+                    
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
@@ -95,5 +96,16 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return auth()->user()->hasRole('Admin') 
+        ? parent::getEloquentQuery() 
+        : parent::getEloquentQuery()->whereHas(
+            'roles',
+            fn(Builder $query) => $query->where
+            ('name', '!=', 'Admin')
+        );
     }
 }
