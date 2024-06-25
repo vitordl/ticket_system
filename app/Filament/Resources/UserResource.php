@@ -12,12 +12,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    
 
     public static function form(Form $form): Form
     {
@@ -32,8 +35,17 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $context): bool => $context === 'create')
                     ->maxLength(255),
+                Select::make('roles')
+                    ->multiple()
+                    ->relationship(
+                        'roles', 
+                        'name', 
+                    fn(Builder $query) => auth()->user()->hasRole('Admin') ? 
+                    null : $query->where('name', '!=', 'Admin'))
+                    ->preload()
             ]);
     }
 
@@ -45,6 +57,7 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+
                
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
