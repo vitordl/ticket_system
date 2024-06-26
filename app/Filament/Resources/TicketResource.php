@@ -34,13 +34,16 @@ class TicketResource extends Resource
                     ->numeric()
                     ->readOnly()
                     ->hidden()
-                    ->default(auth()->user()->id),
+   
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => 
+                auth()->user()->is_admin ? null :
+                $query->where('user_id', auth()->user()->id))
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
@@ -82,4 +85,11 @@ class TicketResource extends Resource
             'edit' => Pages\EditTicket::route('/{record}/edit'),
         ];
     }
+
+
+
+
+    
+
+   
 }

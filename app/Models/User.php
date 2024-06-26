@@ -54,4 +54,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasPermissionTo('access_login');
     }
+
+
+    public function tickets(){
+        return $this->hasMany(Ticket::class);
+    }
 }

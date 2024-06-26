@@ -28,6 +28,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
+        
         return $user->hasPermissionTo('user_create');
     }
 
